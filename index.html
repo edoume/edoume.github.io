@@ -1,16 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-	<title>edoume</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>edoume</title>
+    <!-- JavaScript pour utilisation du modal Bootstrap -->
+    <script src="http://getbootstrap.com/assets/js/docs.min.js"></script>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
 </head>
+
 <body>
-	<div class="container">
-		<p>Hello!</p>
-		<ul>
-			<li><a href="/parisrb/">parisrb</a></li>
-			<li><a href="/gimp/">gimp</a></li>
-		</ul>
-	</div>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+
+                <li class="sidebar-brand">
+                    <img src="github-logo.png" class="center-block">
+                </li>
+                <br><br><br><br>
+                <li class="sidebar-brand">
+                    <a>
+                        <span class="glyphicon glyphicon-user"></span> edoume.github.io
+                    </a>
+                </li>
+
+                <li>
+                    <a href="" data-toggle="modal" data-target="#modLiens">Liens</a>
+                </li>
+
+                <li>
+                    <a href="" data-toggle="modal" data-target="#modGimp">Gimp</a>
+                </li>
+
+                <li>
+                    <a href="" data-toggle="modal" data-target="#modAbout">À propos</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <a href="#menu-toggle" class="btn btn-default hidden-sm hidden-md hidden-lg" id="menu-toggle">Menu <span class="glyphicon glyphicon-chevron-right"></span></a>
+                        <h1>Bienvenue</h1>
+                        <p>Ce site est un petit dépôt qui ne demande qu'à s'agrandir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+
+<!-- Modal Liens -->
+<div class="modal fade" id="modLiens" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title text-center" id="myModalLabel">Liste des liens</h4>
+      </div>
+      <div class="modal-body">
+        <ul>
+            <li><a target="_blank" href="./parisrb/">parisrb</a> (résumé du 4 novembre 2014)</li>
+            <li><a target="_blank" href="./gimp/">GIMP</a> (ressources de l'atelier)</li>
+        </ul>
+      </div> <!-- /modal-body -->
+    </div>
+  </div>
+</div> <!-- /Modal liens -->
+
+<!-- Modal Gimp -->
+<div class="modal fade" id="modGimp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title text-center" id="myModalLabel">GIMP <small> - GNU Image Manipulation Program</small></h4>
+      </div>
+      <div class="modal-body">
+        <ul>
+            <li><a target="_blank" href="http://vviale.developpez.com/tutoriels/gimp/debuter/">S'initier à GIMP</a> (1er atelier)</li>
+            <li><a target="_blank" href="http://gimpchat.com/viewforum.php?f=24">Tutoriels Vidéos</a> (gimpchat.com)</li>
+            <li><a target="_blank" href="http://gimpchat.com/viewforum.php?f=23">Tutoriels Textes</a> (gimpchat.com)</li>
+        </ul>
+      </div> <!-- /modal-body -->
+    </div>
+  </div>
+</div> <!-- /Modal Gimp -->
+
+<!-- Modal About -->
+<div class="modal fade" id="modAbout" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title text-center" id="myModalLabel">À propos</h4>
+      </div>
+      <div class="modal-body">
+      <img src="https://media.giphy.com/media/eU6huKRctrLLG/giphy.gif" class="img-responsive center-block">
+      </div> <!-- /modal-body -->
+    </div>
+  </div>
+</div> <!-- /Modal About -->
+
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
 </body>
+
 </html>
