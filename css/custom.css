@@ -1,3 +1,14 @@
 body{
 	background:url(../img/pentagon.png);
+
+}
+#page-content-wrapper {
+
+}
+#sidebar-wrapper {
+	background-color: #4b4b4b;
+}
+
+a:hover {
+    text-decoration: none;
 }
