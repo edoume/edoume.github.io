@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PGP-Encrypted Chat over WebRTC</title>
+    <script src="js/adapter.js"></script>
+    <script src="js/jquery-2.0.0.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-responsive.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <script src="js/bootstrap.min.js"></script>
+    <style>
+      #chatlog {
+          overflow:auto;
+          width: 100%;
+          height: 350px;
+      }
+      .head {
+        display: inline;
+      }
+      .secure-icon {
+        display: inline;
+        width: 14px;
+        padding-bottom: 3px;
+        padding-right: 2px;
+      }
+      .insecure-icon {
+        display: inline;
+        width: 14px;
+        padding-bottom: 6px;
+        padding-right: 2px;
+      }
+      .sent:before {
+        content: "Me: ";
+      }
+      .recv:before {
+        content: "-> : ";
+      }
+      .msg {
+        display: inline;
+      }
+      #files {
+        display:inline;
+      }
+      #file_list {
+        list-style:none;
+      }
+      #drop_zone {
+        cursor: pointer;
+        display:inline;
+        padding: 10px;
+        margin: 10px;
+        border: 2px dashed grey; 
+        width: 75%;
+        height 100px;
+        background-color: #EEE;
+        border-radius: 7px;
+      }
+      .active {
+        background-color: #DDD !important;
+        border: 2px dashed lightblue !important;
+      }
+      #meIcon{height:20px; width:auto; padding-right:2px; display:none;}
+      #themIcon{height:20px; width:auto; padding-left:2px; padding-bottom: 2px; display:none;}
+    </style>
+</head>
+<body>
+
+<!--Chat Features-->
+
+<div class="container">
+  <fieldset class="well row center-block">
+    <p class="head muted"><img id="meIcon"><<PGP>PGP><img id="themIcon"> :: </p>Serverless WebRTC chat.  Your messages are sent from your browser directly to your partner's browser.</p>
+    <div class="text-info" id="chatlog"></div>
+  </fieldset>
+  <form class="form-inline row" onSubmit="return sendChatboxMessage()" action="">
+  <div class="input-append">
+    <input type="text" id="messageTextBox" class="span10" placeholder="Type your message here">
+    <button type="submit" id="sendMessageBtn" class="btn span2" style="float:right;">Send Message</button>
+  </div>
+  </form>
+  <div class="row center-block">
+    <div id="drop_zone" class="span7">Drop files here to share them with chat members.</div>
+    <input type="file" class="span5" id="files" name="files[]" multiple />
+  </div>
+  <output class="row center-block panel" id="list">
+    <ul class="list-group" id="file_list"></ul>
+  </output>
+  <button onclick="WebRTCChat.initVideo();">Start Video</button>
+  <video id="myVideo" style="width:300px;height:400px;display:inline;" autoplay muted></video>
+  <video id="theirVideo" style="width:300px;height:400px;display:inline;" autoplay muted></video>
+</div>
+
+<!--Modals for connecting-->
+
+<div class="modal" id="hostChat" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="title1" aria-hidden="true" hidden>
+  <div class="modal-header"><h3 id="title1">Send your local offer to someone else</h3></div>
+  <div class="modal-body">
+    Here's your "offer" -- it tells someone else how to connect to you.  Send the whole thing to them, for example in an instant message or e-mail.
+    <br/>
+    <textarea class="input-large offer" id="offer" name="offer" rows="10" cols="100" readonly="true"></textarea>
+    <textarea class="input-large answer" id="answer" name="answer" rows="10" cols="100" placeholder="Then paste their answer here, and the chat will start."></textarea>
+  </div>
+</div>
+
+<div class="modal" id="joinChat" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="title2" aria-hidden="true" hidden>
+  <div class="modal-header"><h3 id="title2">Paste the "offer" you received</h3></div>
+  <div class="modal-body">
+    <div id="offer-string">The person who created the room will send you an "offer" string -- paste it here.</div>
+    <br/>
+    <textarea class="input-large offer" id="offerFromHost" name="offerFromHost" rows="10" cols="100"></textarea>
+    <textarea class="input-large answer" id="answerToHost" name="answerToHost" rows="10" cols="100" placeholder="Next, send them the answer that appears here." readonly="true"></textarea>
+  </div>
+  <div class="modal-footer">This box will dissapear once you are connected.</div>
+</div>
+
+<div class="modal" id="waitForConnection" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="title3" aria-hidden="true" hidden>
+  <div class="title3"><h3 id="myModalLabel">Waiting for connection</h3></div>
+  <div class="modal-body">This dialog will disappear when a connection is made.</div>
+  <div class="spinner" align="center"><img src="img/spinner.gif"></img></div>
+</div>
+
+<div class="modal" id="createOrJoin" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="title4" aria-hidden="true">
+  <div class="modal-header"><h3 id="title4">Create or join a room?</h3></div>
+  <div class="modal-body">
+    <label>Room Name: <input id="roomName" placeholder="Chat Room"></input></label>
+    <label>Send typing notifications:                  <input style="margin:0px;" id="sendTyping" type="checkbox" checked="true"/></label><br>
+    <button class="btn btn-primary" id="createBtn" data-dismiss="modal" aria-hidden="true">Create a New Chat</button>
+    <button class="btn" style="text-align:right;" id="joinBtn" data-dismiss="modal" aria-hidden="true">Join an existing chat</button>
+  </div>
+  <div class="modal-footer">
+    
+  </div>
+</div>
+
+<script src="js/openpgp.js"></script>
+<script src="js/serverless-webrtc.js"></script>
+<script src="js/file-transfer.js"></script>
+<script type="text/javascript">
+window.WebRTCChat = new WebRTCChat();
+
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+var video = document.getElementById('myVideo');
+
+navigator.getUserMedia({
+    audio: false, 
+    video: true
+}, function (stream) {
+  if (window.URL) video.src = window.URL.createObjectURL(stream);
+  else video.src = stream;
+  window.myStream = stream;
+}, function (error){
+  console.log('navigator.getUserMedia error: ', error);
+});
+
+
+/* DOM INTERACTION CODE */
+
+$('#showLocalOffer').modal('hide');
+$('#getRemoteAnswer').modal('hide');
+$('#waitForConnection').modal('hide');
+$('#createOrJoin').modal('show');
+
+function appendFiles(files) {
+    for (var i = 0, f; f = files[i]; i++) {
+        $('#file_list').prepend('<li class="list-group-item"><span class="badge">'+String(f.size)+' bytes</span>'+f.name+' ('+ String(f.type) +')</li>');
+    }
+}
+
+function handleDragOver(evt) {evt.stopPropagation();evt.preventDefault();evt.dataTransfer.dropEffect = 'copy';$('#drop_zone').addClass('active');}
+function handleChooseFiles(evt) {appendFiles(evt.target.files);}
+function handleDropFiles(evt)   {evt.stopPropagation();evt.preventDefault();$('#drop_zone').removeClass('active');appendFiles(evt.dataTransfer.files); return false;}
+
+$('#files').on('change', handleChooseFiles);
+
+var dropZone = document.getElementById('drop_zone');
+dropZone.addEventListener('dragleave', function(e) {$('#drop_zone').removeClass('active')}, false);
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleDropFiles, false);
+
+
+/* used both when joining and hosting */
+
+function getTimestamp () {
+    var totalSec = new Date().getTime() / 1000;
+    var hours = parseInt(totalSec / 3600) % 24;
+    var minutes = parseInt(totalSec / 60) % 60;
+    var seconds = parseInt(totalSec % 60);
+
+    return (hours < 10 ? "0" + hours : hours) + ":" +
+           (minutes < 10 ? "0" + minutes : minutes) + ":" +
+           (seconds  < 10 ? "0" + seconds : seconds);
+}
+
+function displayChatReady() {
+    $('#joinChat').remove();
+    $('#waitForConnection').remove();
+    $('.modal-backdrop').remove();
+    document.title = WebRTCChat.roomName + ":" + document.title;
+    urls = ['img/unlock.png', 'img/lock.png']
+    $('#messageTextBox').focus();
+    $('#sendMessageBtn').addClass('btn-primary');
+}
+
+function sendChatboxMessage() {
+    if ($('#messageTextBox').val()) {
+        WebRTCChat.sendMessage($('#messageTextBox').val());
+        $('#messageTextBox').val('');
+    }
+    return false;
+}
+
+function writeToChatLog(message, message_type, secure) {
+    $('.typing').remove();
+    var img = '<img class="insecure-icon" src="img/unlock.png" width="10px">';
+
+    document.getElementById('chatlog').innerHTML += img + '<p class="msg ' + message_type + '">[' + getTimestamp() + '] ' + message + '</p><br>';
+    $('#chatlog').scrollTop($('#chatlog')[0].scrollHeight);
+}
+
+function displayPartnerTyping() {
+    if (!$('.typing').length) document.getElementById('chatlog').innerHTML += '<p class=\"text-info\ typing">' + "[" + getTimestamp() + "] ...</p>";
+    else $('.typing').html("[" + getTimestamp() + "] ...");
+    setTimeout(function() {
+      $('.typing').remove();
+    }, 2000);
+}
+
+window.WebRTCChat.writeToChatLog = writeToChatLog;
+window.WebRTCChat.displayPartnerTyping = displayPartnerTyping;
+
+/* User interactions to host a chat */
+
+$('#createBtn').click(function() {
+    WebRTCChat.sendTyping = $('#sendTyping').is(':checked');
+    WebRTCChat.roomName = $('#roomName').val();
+    $('#hostChat').modal('show');
+    WebRTCChat.hostChat(function (offer_desc) {
+        $('#offer').html(offer_desc);
+        $('#answer').keyup(function(e) {
+            if ($('#answer').val()) {
+                var answer = JSON.parse($('#answer').val());
+                $('#hostChat').remove();
+                $('.modal-backdrop').remove();
+                $('#waitForConnection').modal('show');
+                WebRTCChat.handleAnswerFromClient(answer);
+            }
+        });
+    }, displayChatReady);
+});
+
+/* User interactions to join a chat  */
+
+$('#joinBtn').click(function() {
+    WebRTCChat.sendTyping = $('#sendTyping').is(':checked');
+    $('#joinChat').modal('show');
+    $('#offerFromHost').keyup(function(e) {
+        if ($('#offerFromHost').val()) {
+            var offer = JSON.parse($('#offerFromHost').val());
+            WebRTCChat.joinChat(offer, function(answer_desc) {
+                $('#answerToHost').html(answer_desc);
+            }, displayChatReady);
+        }
+    });
+});
+
+$('#messageTextBox').keydown(function() {
+    if (WebRTCChat.sendTyping) {
+        WebRTCChat.sendTypingMessage();
+        WebRTCChat.sendTyping = false;
+        setTimeout(function() {
+            WebRTCChat.sendTyping = true;
+        }, 1000);
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+#chatlog {
+    overflow:auto;
+    width: 100%;
+    height: 600px;
+}
+
+#messageTextBox {
+    width: 100%;
+}
+
