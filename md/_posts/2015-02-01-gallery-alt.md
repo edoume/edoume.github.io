@@ -67,5 +67,3 @@ gallery:
 {% include gallery_lightbox.html %}
 {% endraw %}
 ```
-
-{% include gallery_lightbox.html %}
