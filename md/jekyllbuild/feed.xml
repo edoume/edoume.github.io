@@ -125,20 +125,6 @@ The featured image will be added at the beginning of the content, but not above 
 			</item>
 		
 			<item>
-				<title>Gallery Alternative</title>
-				
-				
-					<description>&lt;p&gt;An alternative to the simple gallery would be this version, which displays the post ins a lightbox.
-The setup basically is the same, the include makes all the difference.&lt;/p&gt;
-
-</description>
-				
-				<pubDate>Sun, 01 Feb 2015 00:00:00 +0100</pubDate>
-				<link>/gallery-alt/</link>
-				<guid isPermaLink="true">/gallery-alt/</guid>
-			</item>
-		
-			<item>
 				<title>Vimeo</title>
 				
 				
