@@ -63,7 +63,7 @@ gallery:
 ###### post content
 
 ``` liquid
-{% raw  %}
+{% raw %}
 {% include gallery_lightbox.html %}
 {% endraw %}
 ```
